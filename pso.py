@@ -3,15 +3,17 @@ import torch_geometric
 from torch_geometric.data import Data
 from net import PSOGNN
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 class PSO():
   def __init__(self, X, func, model, lower_bound, upper_bound):
     super().__init__()
-    self.X = X
+    self.X = X.to(device)
     self.func = func
     self.lower_bound = lower_bound
     self.upper_bound = upper_bound
     self.num_particle, self.dim = X.shape
-    self.V = torch.zeros((self.num_particle, self.dim))
+    self.V = torch.zeros((self.num_particle, self.dim)).to(device)
     self.P = X.detach()                                                    # position of all particles for p_best
     self.P_best = torch.full((self.num_particle, 1), float('inf'))         # best fitness of each particle
     self.G = None                                                          # position of a particle that has g_best
@@ -61,7 +63,7 @@ class PSO():
       data = Data(x = self.X, edge_index= edge_index)
       # model = PSOGNN(node_input_dim=self.dim)
       
-      weight = self.model(data)
+      weight = self.model(data).to(device)
       W, C1, C2 = weight[:,0], weight[:, 1], weight[:,2]
       
       new_position = self.update_position(W, C1, C2)
