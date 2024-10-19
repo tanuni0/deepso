@@ -1,6 +1,8 @@
 import torch
 import random
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 class Function:
     @staticmethod
     def get_function(name, x, params):
@@ -23,22 +25,20 @@ class Function:
         else:
             raise ValueError(f"Unknown function name: {name}")
 
-#n dims - many local minima
 class Ackley():
     def __init__(self, x, params):
-        self.x = x
-        self.params = params
-        # self.dim = x.shape[1]
+        self.x = x.to(device)
+        self.params = [p.to(device) if isinstance(p, torch.Tensor) else torch.tensor(p).to(device) for p in params]
 
     def evaluate_function(self):
         a, b, c = self.params
         dim = self.x.shape[1]
-        sum_sp = torch.sum(self.x**2, dim=1)  
-        sum_cos = torch.sum(torch.cos(c * self.x), dim=1)  
+        sum_sp = torch.sum(self.x**2, dim=1)
+        sum_cos = torch.sum(torch.cos(c * self.x), dim=1)
         term1 = -a * torch.exp(-b * torch.sqrt(sum_sp / dim))
         term2 = -torch.exp(sum_cos / dim)
-        result = term1 + term2 + a + torch.exp(torch.tensor(1.0))
-        return result.unsqueeze(1)
+        result = term1 + term2 + a + torch.exp(torch.tensor(1.0).to(device))
+        return torch.abs(result).unsqueeze(1)
 
     @staticmethod
     def generate_functions(num_functions, dims):
@@ -54,14 +54,14 @@ class Ackley():
 
 class Griewank():
     def __init__(self, x, params):
-        self.x = x
-        self.params = params
+        self.x = x.to(device)
+        self.params = [p.to(device) if isinstance(p, torch.Tensor) else torch.tensor(p).to(device) for p in params]
 
     def evaluate_function(self):
         a, b = self.params
         d = self.x.shape[-1]
         term1 = torch.sum(self.x**2, dim=1) / 4000  
-        indices = torch.arange(1, d + 1, dtype=torch.float32).unsqueeze(0)  
+        indices = torch.arange(1, d + 1, dtype=torch.float32).unsqueeze(0).to(device)
         term2 = torch.prod(torch.cos(self.x / torch.sqrt(indices)), dim=1)
         return (term1 - term2 + 1).unsqueeze(1)
 
@@ -78,20 +78,20 @@ class Griewank():
 
 class Largeman():
     def __init__(self, x, params):
-        self.x = x
-        self.params = params
+        self.x = x.to(device)
+        self.params = (params[0], params[1].to(device), params[2].to(device))
 
     def evaluate_function(self):
         m, c, A = self.params
-        x_expanded = self.x.unsqueeze(1)  
+        x_expanded = self.x.unsqueeze(1)
         A_expanded = A.unsqueeze(0)
 
-        sum_term = torch.sum((x_expanded - A_expanded) ** 2, dim=-1)  
+        sum_term = torch.sum((x_expanded - A_expanded) ** 2, dim=-1)
         exp_term = torch.exp(-sum_term / torch.pi)
         cos_term = torch.cos(torch.pi * sum_term)
 
-        result = torch.sum(c * exp_term * cos_term, dim=-1)  
-        return result.unsqueeze(1) 
+        result = torch.sum(c * exp_term * cos_term, dim=-1)
+        return result.unsqueeze(1)
 
     @staticmethod
     def generate_functions(num, dims):
@@ -107,8 +107,8 @@ class Largeman():
 
 class Levy():
     def __init__(self, x, params):
-        self.x = x
-        self.params = params
+        self.x = x.to(device)
+        self.params = [p.to(device) if isinstance(p, torch.Tensor) else torch.tensor(p).to(device) for p in params]
 
     def evaluate_function(self):
         a, b, c = self.params
@@ -118,7 +118,7 @@ class Levy():
         term2 = torch.sum((w[:, :-1] - 1) ** 2 * (1 + b * torch.sin(torch.pi * w[:, :-1] + 1) ** 2), dim=1)
         term3 = (w[:, -1] - 1) ** 2 * (1 + c * torch.sin(2 * torch.pi * w[:, -1]) ** 2)
 
-        return (term1 + term2 + term3).unsqueeze(1) 
+        return (term1 + term2 + term3).unsqueeze(1)
 
     @staticmethod
     def generate_functions(num, dims):
@@ -131,10 +131,11 @@ class Levy():
                 c = random.uniform(0.5, 2.0)
                 functions[dim].append([a, b, c])
         return functions
+
 class Rastrigin():
     def __init__(self, x, params):
-        self.x = x
-        self.params = params
+        self.x = x.to(device)
+        self.params = [p.to(device) if isinstance(p, torch.Tensor) else torch.tensor(p).to(device) for p in params]
 
     def evaluate_function(self):
         a, b = self.params
@@ -155,8 +156,8 @@ class Rastrigin():
 
 class Buckin():
     def __init__(self, x, params):
-        self.params = params
-        self.x = x
+        self.x = x.to(device)
+        self.params = [p.to(device) if isinstance(p, torch.Tensor) else torch.tensor(p).to(device) for p in params]
 
     def evaluate_function(self):
         a, b, c = self.params
@@ -175,10 +176,11 @@ class Buckin():
                 c = random.uniform(0, 1)
                 functions[dim].append([a, b, c])
         return functions
+
 class CrossInTray():
     def __init__(self, x, params):
-        self.params = params
-        self.x = x
+        self.x = x.to(device)
+        self.params = [p.to(device) if isinstance(p, torch.Tensor) else torch.tensor(p).to(device) for p in params]
 
     def evaluate_function(self):
         a, b, c = self.params
@@ -200,8 +202,8 @@ class CrossInTray():
 
 class DropWave():
     def __init__(self, x, params):
-        self.params = params
-        self.x = x
+        self.x = x.to(device)
+        self.params = [p.to(device) if isinstance(p, torch.Tensor) else torch.tensor(p).to(device) for p in params]
 
     def evaluate_function(self):
         a, b, c, d = self.params
