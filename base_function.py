@@ -224,3 +224,181 @@ class DropWave():
                 d = random.uniform(-5, 5)
                 functions[dim].append([a, b, c, d])
         return functions
+    
+class Bukin6():
+    def __init__(self, x, params):
+        self.x = x.to(device)
+        self.params = params
+
+    def evaluate_function(self):
+        x1, x2 = self.x[:, 0], self.x[:, 1]
+        a, b = self.params
+        term1 = a * torch.sqrt(torch.abs(x2 - b * x1**2))
+        term2 = b * torch.abs(x1 + 10)
+        return (term1 + term2).unsqueeze(1)
+
+    @staticmethod
+    def generate_functions(num_functions, dims):
+        functions = {}
+        for dim in dims:
+            functions[dim] = []
+            for _ in range(num_functions):
+                a = random.uniform(80, 120)  # Random factor for term1
+                b = random.uniform(0.005, 0.02)  # Random coefficient for x1^2
+                functions[dim].append([a, b])
+        return functions
+
+class Eggholder():
+    def __init__(self, x, params):
+        self.x = x.to(device)
+        self.params = params
+
+    def evaluate_function(self):
+        x1, x2 = self.x[:, 0], self.x[:, 1]
+        a = self.params[0]  # Add a scaling parameter
+        term1 = -(x2 + 47) * torch.sin(torch.sqrt(torch.abs(x1 / 2 + x2 + 47)))
+        term2 = -x1 * torch.sin(torch.sqrt(torch.abs(x1 - (x2 + 47))))
+        return (a * (term1 + term2)).unsqueeze(1)
+
+    @staticmethod
+    def generate_functions(num_functions, dims):
+        functions = {}
+        for dim in dims:
+            functions[dim] = []
+            for _ in range(num_functions):
+                a = random.uniform(0.8, 1.2)  # Scaling factor
+                functions[dim].append([a])
+        return functions
+
+class GramacyLee():
+    def __init__(self, x, params):
+        self.x = x.to(device)
+        self.params = params
+
+    def evaluate_function(self):
+        a = self.params[0]  # Scaling parameter
+        term1 = torch.sin(10 * torch.pi * self.x) / (2 * self.x)
+        term2 = (self.x - 1) ** 4
+        return (a * (term1 + term2)).unsqueeze(1)
+
+    @staticmethod
+    def generate_functions(num_functions, dims):
+        functions = {}
+        for dim in dims:
+            functions[dim] = []
+            for _ in range(num_functions):
+                a = random.uniform(0.5, 1.5)  # Random scaling factor
+                functions[dim].append([a])
+        return functions
+
+class Levy13():
+    def __init__(self, x, params):
+        self.x = x.to(device)
+        self.params = params
+
+    def evaluate_function(self):
+        a, b = self.params
+        x1, x2 = self.x[:, 0], self.x[:, 1]
+        term1 = torch.sin(a * torch.pi * x1)**2
+        term2 = (x1 - 1)**2 * (1 + torch.sin(b * torch.pi * x2)**2)
+        term3 = (x2 - 1)**2 * (1 + torch.sin(2 * torch.pi * x2)**2)
+        return (term1 + term2 + term3).unsqueeze(1)
+
+    @staticmethod
+    def generate_functions(num_functions, dims):
+        functions = {}
+        for dim in dims:
+            functions[dim] = []
+            for _ in range(num_functions):
+                a = random.uniform(2.5, 3.5)  # Sin scaling for x1
+                b = random.uniform(2.5, 3.5)  # Sin scaling for x2
+                functions[dim].append([a, b])
+        return functions
+
+class Schaffer2():
+    def __init__(self, x, params):
+        self.x = x.to(device)
+        self.params = params
+
+    def evaluate_function(self):
+        a = self.params[0]  # Add a scaling parameter
+        x1, x2 = self.x[:, 0], self.x[:, 1]
+        num = torch.sin(x1**2 - x2**2)**2 - 0.5
+        denom = (1 + 0.001 * (x1**2 + x2**2))**2
+        return (a * (0.5 + num / denom)).unsqueeze(1)
+
+    @staticmethod
+    def generate_functions(num_functions, dims):
+        functions = {}
+        for dim in dims:
+            functions[dim] = []
+            for _ in range(num_functions):
+                a = random.uniform(0.8, 1.2)  # Scaling factor
+                functions[dim].append([a])
+        return functions
+
+class Schaffer4():
+    def __init__(self, x, params):
+        self.x = x.to(device)
+        self.params = params
+
+    def evaluate_function(self):
+        a = self.params[0]  # Add a scaling parameter
+        x1, x2 = self.x[:, 0], self.x[:, 1]
+        num = torch.cos(torch.sin(torch.abs(x1**2 - x2**2)))**2 - 0.5
+        denom = (1 + 0.001 * (x1**2 + x2**2))**2
+        return (a * (0.5 + num / denom)).unsqueeze(1)
+
+    @staticmethod
+    def generate_functions(num_functions, dims):
+        functions = {}
+        for dim in dims:
+            functions[dim] = []
+            for _ in range(num_functions):
+                a = random.uniform(0.8, 1.2)  # Scaling factor
+                functions[dim].append([a])
+        return functions
+
+class Schwefel():
+    def __init__(self, x, params):
+        self.x = x.to(device)
+        self.params = params
+
+    def evaluate_function(self):
+        a = self.params[0]  # Add a scaling parameter
+        dim = self.x.shape[1]
+        sum_term = torch.sum(self.x * torch.sin(torch.sqrt(torch.abs(self.x))), dim=1)
+        return (a * (418.9829 * dim - sum_term)).unsqueeze(1)
+
+    @staticmethod
+    def generate_functions(num_functions, dims):
+        functions = {}
+        for dim in dims:
+            functions[dim] = []
+            for _ in range(num_functions):
+                a = random.uniform(0.8, 1.2)  # Scaling factor
+                functions[dim].append([a])
+        return functions
+
+class Shubert():
+    def __init__(self, x, params):
+        self.x = x.to(device)
+        self.params = params
+
+    def evaluate_function(self):
+        x1, x2 = self.x[:, 0], self.x[:, 1]
+        a, b = self.params
+        sum1 = torch.sum(torch.tensor([i * torch.cos((i + a) * x1 + i) for i in range(1, 6)]), dim=0)
+        sum2 = torch.sum(torch.tensor([i * torch.cos((i + b) * x2 + i) for i in range(1, 6)]), dim=0)
+        return (sum1 * sum2).unsqueeze(1)
+
+    @staticmethod
+    def generate_functions(num_functions, dims):
+        functions = {}
+        for dim in dims:
+            functions[dim] = []
+            for _ in range(num_functions):
+                a = random.uniform(1, 2)  # Parameter for x1
+                b = random.uniform(1, 2)  # Parameter for x2
+                functions[dim].append([a, b])
+        return functions
